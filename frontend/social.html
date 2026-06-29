@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Pulse | Social Media Portal</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="logo-text">SocialPulse</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item"><i class="fa-solid fa-gauge"></i> Overview</a>
+                <a href="social.html" class="nav-item active"><i class="fa-solid fa-users"></i> Social Portal</a>
+                <a href="science.html" class="nav-item"><i class="fa-solid fa-flask"></i> Science Portal</a>
+                <a href="#reddit-section" class="nav-item"><i class="fa-brands fa-reddit"></i> Reddit Trends</a>
+                <a href="#youtube-section" class="nav-item"><i class="fa-brands fa-youtube"></i> YouTube Trends</a>
+                <a href="#news-section" class="nav-item"><i class="fa-regular fa-newspaper"></i> News API</a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="db-status">
+                    <span class="status-indicator online"></span>
+                    <span class="status-text">Social APIs Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h1>Social Media Portal</h1>
+                    <p class="subtitle">Live signals from Reddit, YouTube, and Global News Networks</p>
+                </div>
+                <div class="header-controls">
+                    <div id="sim-mode-indicator" class="sim-mode-badge" style="display: none;">
+                        <i class="fa-solid fa-robot"></i> Date-Seeded Simulation Mode
+                    </div>
+                    <button class="btn btn-primary" id="refresh-social-btn">
+                        <i class="fa-solid fa-arrows-rotate"></i> Sync Live Social Data
+                    </button>
+                </div>
+            </header>
+
+            <!-- Reddit Section -->
+            <section class="charts-section" id="reddit-section">
+                <div class="chart-card glass full-chart interactive-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <h2 style="color: var(--reddit);"><i class="fa-brands fa-reddit"></i> Reddit Top Discussions</h2>
+                            <p class="chart-subtitle">Most active threads across tracked technology and science subreddits</p>
+                        </div>
+                        <div class="kpi-group">
+                            <div class="kpi-badge">
+                                <span>Tracked Subs:</span> <strong id="reddit-tracked-count">-</strong>
+                            </div>
+                            <div class="kpi-badge">
+                                <span>24h Comments:</span> <strong id="reddit-comment-volume">-</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="trending-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Subreddit</th>
+                                    <th>Discussion Title</th>
+                                    <th>Upvotes</th>
+                                    <th>Comments</th>
+                                    <th>Source</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reddit-tbody">
+                                <tr>
+                                    <td colspan="5" class="empty-state">
+                                        <div class="skeleton-pulse" style="height: 40px; margin: 10px 0; border-radius: 8px;"></div>
+                                        <div class="skeleton-pulse" style="height: 40px; margin: 10px 0; border-radius: 8px;"></div>
+                                        <div class="skeleton-pulse" style="height: 40px; margin: 10px 0; border-radius: 8px;"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- YouTube Section -->
+            <section class="charts-section" id="youtube-section">
+                <div class="chart-card glass full-chart interactive-card">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <h2 style="color: #ff0000;"><i class="fa-brands fa-youtube"></i> YouTube Trending</h2>
+                            <p class="chart-subtitle">Viral videos scored by engagement metrics</p>
+                        </div>
+                        <div class="kpi-group">
+                            <div class="kpi-badge">
+                                <span>Peak Virality:</span> <strong id="youtube-top-virality">-</strong>
+                            </div>
+                            <div class="kpi-badge">
+                                <span>Avg Engagement:</span> <strong id="youtube-avg-engagement">-</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="youtube-grid" id="youtube-grid">
+                        <!-- Skeleton Loaders -->
+                        <div class="yt-card glass"><div class="skeleton-pulse" style="height: 120px; border-radius: 8px;"></div></div>
+                        <div class="yt-card glass"><div class="skeleton-pulse" style="height: 120px; border-radius: 8px;"></div></div>
+                        <div class="yt-card glass"><div class="skeleton-pulse" style="height: 120px; border-radius: 8px;"></div></div>
+                        <div class="yt-card glass"><div class="skeleton-pulse" style="height: 120px; border-radius: 8px;"></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- News Section -->
+            <section class="charts-section" id="news-section">
+                <div class="chart-card glass full-chart interactive-card">
+                    <div class="chart-header" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                        <div class="chart-title-group">
+                            <h2 style="color: var(--cyan);"><i class="fa-regular fa-newspaper"></i> Global News Feed</h2>
+                            <p class="chart-subtitle">Breaking headlines and category-wise updates</p>
+                        </div>
+                        <div class="filter-controls">
+                            <select id="news-category-select" class="form-select">
+                                <option value="breaking">Breaking News</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Science">Science</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Sports">Sports</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="news-grid" id="news-grid">
+                        <div class="news-card glass"><div class="skeleton-pulse" style="height: 80px; border-radius: 8px;"></div></div>
+                        <div class="news-card glass"><div class="skeleton-pulse" style="height: 80px; border-radius: 8px;"></div></div>
+                        <div class="news-card glass"><div class="skeleton-pulse" style="height: 80px; border-radius: 8px;"></div></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script -->
+    <script src="social.js"></script>
+</body>
+</html>

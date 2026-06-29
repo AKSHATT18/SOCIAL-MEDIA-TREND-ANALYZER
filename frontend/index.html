@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Pulse | Multi-Category Google Trends Analyzer</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ApexCharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="logo-text">SocialPulse</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-item active"><i class="fa-solid fa-gauge"></i> Overview</a>
+                <a href="social.html" class="nav-item"><i class="fa-solid fa-users"></i> Social Portal</a>
+                <a href="science.html" class="nav-item"><i class="fa-solid fa-flask"></i> Science Portal</a>
+                <a href="#trends-section" class="nav-item"><i class="fa-solid fa-arrow-trend-up"></i> Category Trends</a>
+                <a href="#searches-section" class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> Trending Searches</a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="db-status">
+                    <span class="status-indicator online"></span>
+                    <span class="status-text">DuckDB OLAP Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h1>Multi-Category Trend Dashboard</h1>
+                    <p class="subtitle">Global Google Trends interest indices & country-specific search queries</p>
+                </div>
+                <div class="header-controls">
+                    <button class="btn btn-primary" id="refresh-btn">
+                        <i class="fa-solid fa-arrows-rotate"></i> Sync Live Trends
+                    </button>
+                </div>
+            </header>
+
+            <!-- Metrics Grid (KPIs) -->
+            <section class="metrics-grid">
+                <div class="metric-card glass">
+                    <div class="metric-icon accent-color-2"><i class="fa-solid fa-list"></i></div>
+                    <div class="metric-info">
+                        <h3>Monitored Categories</h3>
+                        <p class="metric-value">10 Categories</p>
+                    </div>
+                </div>
+                <div class="metric-card glass">
+                    <div class="metric-icon accent-color-1"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                    <div class="metric-info">
+                        <h3>Top Category</h3>
+                        <p class="metric-value" id="kpi-top-category">Loading...</p>
+                    </div>
+                </div>
+                <div class="metric-card glass">
+                    <div class="metric-icon twitter-color"><i class="fa-solid fa-earth-americas"></i></div>
+                    <div class="metric-info">
+                        <h3>Top US Search</h3>
+                        <p class="metric-value" id="kpi-top-search" style="font-size: 1.2rem; line-height: 1.2; padding-top: 0.3rem;">Loading...</p>
+                    </div>
+                </div>
+                <div class="metric-card glass">
+                    <div class="metric-icon reddit-color"><i class="fa-solid fa-database"></i></div>
+                    <div class="metric-info">
+                        <h3>Total Engagements</h3>
+                        <p class="metric-value" id="kpi-engagement">-</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Charts Grid -->
+            <section class="charts-section" id="trends-section">
+                <!-- Main Category Interest Chart -->
+                <div class="chart-card glass large-chart">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <h2>Category Interest Comparison</h2>
+                            <p class="chart-subtitle">Relative Google search interest over the last 30 days (Scale 0-100)</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div id="category-chart" class="chart-element"></div>
+                    </div>
+                </div>
+
+                <!-- Column: Category Trending Searches -->
+                <div class="chart-card glass medium-chart" id="searches-section">
+                    <div class="chart-header" style="flex-direction: column; align-items: flex-start; gap: 0.75rem;">
+                        <div class="chart-title-group">
+                            <h2>Trending Queries</h2>
+                            <p class="chart-subtitle">Live searches filtered by region and domain</p>
+                        </div>
+                        <div class="filter-controls" style="display: flex; gap: 0.5rem; width: 100%;">
+                            <select id="country-select" class="form-select" style="flex: 1;">
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Canada">Canada</option>
+                                <option value="India">India</option>
+                            </select>
+                            <select id="category-select" class="form-select" style="flex: 1;">
+                                <option value="General">General</option>
+                                <option value="AI">AI</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Education">Education</option>
+                                <option value="Politics">Politics</option>
+                                <option value="Gaming">Gaming</option>
+                                <option value="Science">Science</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="trending-list-container" style="flex-grow: 1; overflow-y: auto; max-height: 280px; margin-top: 0.5rem;">
+                        <table class="trending-table" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-glass); text-align: left; font-size: 0.8rem; color: var(--text-dark);">
+                                    <th style="padding: 0.5rem 0.25rem;">Rank</th>
+                                    <th style="padding: 0.5rem 0.25rem;">Search Query</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trending-queries-tbody">
+                                <tr>
+                                    <td colspan="2" style="text-align: center; padding: 2rem; color: var(--text-muted); font-style: italic;">Loading trending searches...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sentiment & Predictive Trends for Chosen Category -->
+            <section class="charts-section">
+                <!-- Category Timeseries and Forecast Chart -->
+                <div class="chart-card glass full-chart">
+                    <div class="chart-header">
+                        <div class="chart-title-group">
+                            <h2>Category Projection & 5-Day Forecast</h2>
+                            <p class="chart-subtitle">Historical interest index (solid) mapped with linear regression projections (dashed)</p>
+                        </div>
+                        <div class="chart-actions">
+                            <label for="forecast-category-select" class="select-label">Select Category:</label>
+                            <select id="forecast-category-select" class="form-select">
+                                <option value="AI">AI</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Education">Education</option>
+                                <option value="Politics">Politics</option>
+                                <option value="Gaming">Gaming</option>
+                                <option value="Science">Science</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div id="category-forecast-chart" class="chart-element"></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>

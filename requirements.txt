@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+duckdb
+pandas
+numpy
+textblob
+nltk
+pytrends
+requests
