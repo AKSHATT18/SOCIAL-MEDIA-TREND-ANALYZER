@@ -4,8 +4,10 @@ from datetime import datetime, timezone
 import duckdb
 from pytrends.request import TrendReq
 import requests
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+import asyncio
+from typing import List
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +43,36 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except:
+                pass
+
+manager = ConnectionManager()
+
+@app.websocket("/api/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
 
 def get_db_connection():
     if not os.path.exists(DB_PATH):
@@ -810,14 +842,13 @@ def get_trend_predictions(keyword: str = Query(None)):
         return []
 
 # Unified Pipeline Execution Trigger
-@app.post("/api/pipeline/run")
-def run_pipeline():
-    """Trigger both social and google trends ETL runs."""
+async def _run_pipelines_task():
     try:
+        await manager.broadcast({"event": "pipeline_started"})
         # 1. Run social pipeline if raw data is ready
         try:
             from backend.pipeline import run_etl_pipeline
-            run_etl_pipeline()
+            await asyncio.to_thread(run_etl_pipeline)
             social_status = "success"
         except Exception as e:
             social_status = f"failed: {e}"
@@ -825,18 +856,24 @@ def run_pipeline():
         # 2. Run google trends pipeline
         try:
             from backend.google_trends_pipeline import run_google_trends_pipeline
-            run_google_trends_pipeline()
+            await asyncio.to_thread(run_google_trends_pipeline)
             google_status = "success"
         except Exception as e:
             google_status = f"failed: {e}"
             
-        return {
-            "status": "completed",
-            "social_pipeline": social_status,
-            "google_trends_pipeline": google_status
-        }
+        await manager.broadcast({
+            "event": "pipeline_completed",
+            "social_status": social_status,
+            "google_status": google_status
+        })
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        await manager.broadcast({"event": "pipeline_error", "error": str(e)})
+
+@app.post("/api/pipeline/run")
+async def run_pipeline(background_tasks: BackgroundTasks):
+    """Trigger both social and google trends ETL runs."""
+    background_tasks.add_task(_run_pipelines_task)
+    return {"status": "started", "message": "Pipeline triggered in background"}
 
 if __name__ == "__main__":
     import uvicorn
